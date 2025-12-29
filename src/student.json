@@ -1,0 +1,8 @@
+[
+    { "id": 1, "name": "John Doe", "age": 16, "grade": "A" },
+    { "id": 2, "name": "Jane Smith", "age": 15, "grade": "B+" },
+    { "id": 3, "name": "Alice Johnson", "age": 17, "grade": "A-" },
+    { "id": 4, "name": "Robert Brown", "age": 16, "grade": "B" },
+    { "id": 5, "name": "Emily Davis", "age": 15, "grade": "A+" },
+    { "id": 6, "name": "Michael Wilson", "age": 18, "grade": "B-" }
+]

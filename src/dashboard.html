@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Record Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Sidebar Navigation - Desktop -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm hidden lg:block">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-indigo-600">Student Portal</h2>
+        </div>
+        <nav class="p-4 space-y-2">
+            <button onclick="setActiveNav('Dashboard')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-gray-50">
+                <span>Dashboard</span>
+            </button>
+            <button onclick="setActiveNav('View Students')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
+                <span>View Students</span>
+            </button>
+            <button onclick="setActiveNav('Add Student')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-gray-50">
+                <span>Add Student</span>
+            </button>
+        </nav>
+        <div class="absolute bottom-0 w-64 p-4 border-t border-gray-200">
+            <button class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 min-h-screen">
+        <header class="bg-white border-b border-gray-200 shadow-sm">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-gray-900">Student Record Dashboard</h1>
+            </div>
+        </header>
+
+        <div class="p-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <!-- Table Header with Search -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Student Records</h2>
+                            <p class="text-sm text-gray-600 mt-1">Manage and view all student information</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="m21 21-4.35-4.35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search by name, ID, or grade..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            oninput="filterStudents()"
+                        />
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700">ID</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700">Name</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700">Age</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700">Grade</th>
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="divide-y divide-gray-200"></tbody>
+                    </table>
+
+                    <div id="noResults" class="text-center py-12 hidden">
+                        <p class="font-semibold text-gray-600">No students found</p>
+                        <p class="text-sm text-gray-500 mt-1">Try adjusting your search query</p>
+                    </div>
+                </div>
+
+                <!-- Table Footer -->
+                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <p class="text-sm text-gray-600">
+                        Showing <span id="filteredCount" class="font-semibold text-gray-900">0</span> of <span id="totalCount" class="font-semibold text-gray-900">0</span> students
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <p class="text-sm text-gray-600 mb-1">Total Students</p>
+                    <p id="totalStudents" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <p class="text-sm text-gray-600 mb-1">Average Age</p>
+                    <p id="averageAge" class="text-2xl font-bold text-gray-900">0.0 years</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <p class="text-sm text-gray-600 mb-1">Active Records</p>
+                    <p id="activeRecords" class="text-2xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let students = [];
+        let filteredStudents = [];
+
+        async function loadStudents() {
+            try {
+                const response = await fetch('student.json');
+                if (!response.ok) throw new Error('Failed to load student data');
+                students = await response.json();
+                filteredStudents = [...students];
+                renderStudents();
+                updateStats();
+            } catch (error) {
+                console.error(error);
+                alert('Could not load student data. Make sure student.json exists and is valid.');
+            }
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('studentTableBody');
+            const noResults = document.getElementById('noResults');
+            
+            tbody.innerHTML = '';
+            
+            if (filteredStudents.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                
+                filteredStudents.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition-colors';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-medium text-gray-900">#${String(student.id).padStart(3, '0')}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">${student.name}</td>
+                        <td class="px-6 py-4 text-gray-600">${student.age}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                ${student.grade}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <button onclick="editStudent(${student.id})" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit student">Edit</button>
+                                <button onclick="deleteStudent(${student.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete student">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+            
+            document.getElementById('filteredCount').textContent = filteredStudents.length;
+            document.getElementById('totalCount').textContent = students.length;
+        }
+
+        function filterStudents() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            filteredStudents = students.filter(student =>
+                student.name.toLowerCase().includes(searchQuery) ||
+                student.id.toString().includes(searchQuery) ||
+                student.grade.toLowerCase().includes(searchQuery)
+            );
+            renderStudents();
+        }
+
+        function updateStats() {
+            document.getElementById('totalStudents').textContent = students.length;
+            const avgAge = students.reduce((acc, s) => acc + s.age, 0) / students.length || 0;
+            document.getElementById('averageAge').textContent = avgAge.toFixed(1) + ' years';
+            document.getElementById('activeRecords').textContent = students.length;
+        }
+
+        function editStudent(id) {
+            alert('Edit student #' + id + ' - placeholder');
+        }
+
+        function deleteStudent(id) {
+            if(confirm('Are you sure you want to delete student #' + id + '?')) {
+                alert('Delete student #' + id + ' - placeholder');
+            }
+        }
+
+        loadStudents();
+    </script>
+</body>
+</html>
